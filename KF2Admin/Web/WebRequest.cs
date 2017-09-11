@@ -32,6 +32,7 @@ namespace KF2Admin.Web
 
         private bool responseOK = false;
         private string responseContentData = null;
+        private string postData;
 
         public WebRequest(string requestUrl, string method, string userAgent, CookieContainer cookieContainer, string postData = "", string contentType = "")
         {
@@ -44,11 +45,7 @@ namespace KF2Admin.Web
             {
                 request.ContentType = contentType;
                 request.ContentLength = postData.Length;
-                using (Stream str = request.GetRequestStream())
-                {
-                    str.Write(GetBytes(postData), 0, postData.Length);
-                    str.Close();
-                }
+                this.postData = postData;
             }
         }
 
@@ -61,6 +58,15 @@ namespace KF2Admin.Web
         {
             try
             {
+                if (request.Method == "POST")
+                {
+                    using (Stream str = request.GetRequestStream())
+                    {
+                        str.Write(GetBytes(postData), 0, postData.Length);
+                        str.Close();
+                    }
+                }
+
                 response = (HttpWebResponse)request.GetResponse();
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
