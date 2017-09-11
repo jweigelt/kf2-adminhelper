@@ -66,7 +66,6 @@ namespace KF2Admin.Web
 
         private static readonly string[] PLAYER_ACTIONS = { "kick", "sessionban", "banip", "banid", "mutevoice", "unmutevoice" };
 
-
         private CookieContainer cookieContainer = null;
 
         public WebHelper()
@@ -77,6 +76,7 @@ namespace KF2Admin.Web
         {
             cookieContainer = new CookieContainer();
         }
+
         public bool Authenticate()
         {
             WebRequest initialRequest = null;
@@ -85,7 +85,7 @@ namespace KF2Admin.Web
             string token = null;
             string authString = null;
 
-            Logger.Log("[WEB] Logging in...", LogLevel.Info);
+            Logger.Log("[WEB] Logging in...", LogLevel.Verbose);
 
             try
             {
@@ -115,6 +115,7 @@ namespace KF2Admin.Web
             Logger.Log("[WEB] Login OK.", LogLevel.Info);
             return true;
         }
+
         public bool Logout()
         {
             Logger.Log("[WEB] Logging out...", LogLevel.Info);
@@ -131,6 +132,7 @@ namespace KF2Admin.Web
             Logger.Log("[WEB] Logout OK.", LogLevel.Info);
             return true;
         }
+
         public List<Player> GetPlayerList()
         {
             WebRequest playerRequest = null;
@@ -176,6 +178,7 @@ namespace KF2Admin.Web
             }
             return playerList;
         }
+
         private Player GetPlayer(HtmlElement tr)
         {
             List<HtmlElement> cells = HtmlElement.FindElementsByTagMatch(tr.InnerHTML, "td", false);
@@ -196,10 +199,10 @@ namespace KF2Admin.Web
 
             return player;
         }
+
         public ChatMessage GetChat()
         {
             WebRequest chatRequest = new WebRequest(WebAdminUrl + LOCATION_CHAT, "POST", UserAgent, cookieContainer, "ajax=1", "application/x-www-form-urlencoded");
-
             try
             {
                 chatRequest.PerformRequest();
@@ -222,6 +225,7 @@ namespace KF2Admin.Web
 
             return null;
         }
+
         public bool PlayerAction(Player player, PlayerAction action)
         {
             string postData = string.Format("ajax=1&action={0}&playerkey={1}", PLAYER_ACTIONS[(int)action], player.PlayerKey);
@@ -238,6 +242,7 @@ namespace KF2Admin.Web
                 return false;
             }
         }
+
         public bool Say(string message)
         {
             try
@@ -251,8 +256,8 @@ namespace KF2Admin.Web
                 Logger.Log("Failed to say '{0}' : {1}", LogLevel.Warning, message, e.Message);
                 return false;
             }
-
         }
+
         public List<string> GetInstalledMaps()
         {
             WebRequest mapRequest = new WebRequest(WebAdminUrl + LOCATION_MAP_LIST, "GET", UserAgent, cookieContainer);
@@ -269,6 +274,7 @@ namespace KF2Admin.Web
                 return null;
             }
         }
+
         public List<string> GetInstalledGamemodes()
         {
             List<string> modes = new List<string>();
@@ -293,6 +299,7 @@ namespace KF2Admin.Web
             }
             return modes;
         }
+
         public bool ChangeCurrent(ChangeCurrentAction action, string s1, string s2 = "")
         {
             string postData = "action=change";
@@ -320,8 +327,8 @@ namespace KF2Admin.Web
                 Logger.Log("Failed to change map {0}", LogLevel.Warning, e.Message);
                 return false;
             }
-
         }
+
         public bool ChangeGeneral(params string[] postParams)
         {
             string postData = "action=save&liveAdjust=1";
@@ -354,6 +361,5 @@ namespace KF2Admin.Web
         {
             return ChangeGeneral("settings_GameDifficulty", d.Value, "settings_GameDifficulty_raw", d.Value);
         }
-
     }
 }

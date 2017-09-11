@@ -19,9 +19,9 @@ namespace KF2Admin.Config
 {
     public class CoreConfiguration
     {
-        public string WebAdminURL { get; set; } = "http://blinky.janelo.net:8080";
+        public string WebAdminURL { get; set; } = "http://localhost:8080";
         public string WebAdminUserName { get; set; } = "admin";
-        public string WebAdminPassword { get; set; } = "m0ngo";
+        public string WebAdminPassword { get; set; } = "1234";
 
         public int TickDelay { get; set; } = 5;
         public int PlayerListUpdateDelay { get; set; } = 5000;

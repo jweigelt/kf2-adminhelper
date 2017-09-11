@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with kf2 adminhelper.  If not, see <http://www.gnu.org/licenses/>.
  */
-using System;
 using System.Collections.Generic;
 using KF2Admin.Utility;
 namespace KF2Admin.Admin
