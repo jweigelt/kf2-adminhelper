@@ -56,7 +56,7 @@ namespace KF2Admin.Admin.Announce
 
             Logger.Log("[ANN] Broadcasting Announce '{0}'", LogLevel.Verbose, announce);
             tool.Web.Say(announce);
-            //TODO: Announce ausgeben  
+            currentIndex++;
         }
     }
 }

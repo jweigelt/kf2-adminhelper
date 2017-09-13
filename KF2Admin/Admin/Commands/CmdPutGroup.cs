@@ -59,7 +59,7 @@ namespace KF2Admin.Admin.Commands
             {
                 if (pg.Name.ToLower().Equals(command[2].ToLower()))
                 {          
-                    return ModifyGroup(pg, player);
+                    return ModifyGroup(pg, affectedPlayer);
                 }
             }
 
