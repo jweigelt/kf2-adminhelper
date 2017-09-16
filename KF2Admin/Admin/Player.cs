@@ -20,7 +20,7 @@ namespace KF2Admin.Admin
 {
     public class Player
     {
-        public Player(string playerName, string uqNetId, string steamId, string playerKey, IPAddress ipAddress, UInt16 ping, UInt32 playerId, bool isAdmin, bool isSpectator)
+        public Player(string playerName, string uqNetId, string steamId, string playerKey, IPAddress ipAddress, ushort ping, uint playerId, bool isAdmin, bool isSpectator)
         {
             PlayerName = playerName;
             UqNetId = uqNetId;
@@ -32,7 +32,16 @@ namespace KF2Admin.Admin
             IsAdmin = isAdmin;
             IsSpectator = isSpectator;
         }
-
+        public Player(string playerName, string perk, int dosh, int health, long kills, ushort ping, bool isAdmin)
+        {
+            PlayerName = playerName;
+            Perk = perk;
+            Dosh = dosh;
+            Health = health;
+            Kills = kills;
+            Ping = ping;
+            IsAdmin = isAdmin;
+        }
 
         public string PlayerName { get; set; } = string.Empty;
         public string UqNetId { get; set; } = string.Empty;
@@ -40,10 +49,29 @@ namespace KF2Admin.Admin
         public string PlayerKey { get; set; } = string.Empty;
         public IPAddress IpAddress { get; set; } = null;
 
-        public UInt16 Ping { get; set; } = 0;
-        public UInt32 PlayerId { get; set; } = 0;
+        public ushort Ping { get; set; } = 0;
+        public uint PlayerId { get; set; } = 0;
 
         public bool IsAdmin { get; set; } = false;
         public bool IsSpectator { get; set; } = false;
+
+        public bool IsNew { get; set; } = false;
+        public long DatabaseId { get; set; } = 0;
+        public long Visits { get; set; } = 0;
+        public long LastVisit { get; set; }
+
+        public long Kills { get; set; } = 0;
+        public int Health { get; set; } = 0;
+        public int Dosh { get; set; } = 0;
+        public string Perk { get; set; } = string.Empty;
+         
+        public void CopyStats(Player p)
+        {
+            Kills = p.Kills;
+            Health = p.Health;
+            Perk = p.Perk;
+            Dosh = p.Dosh;
+        }
+
     }
 }

@@ -23,12 +23,12 @@ namespace KF2Admin.Admin.Commands
         public string OnMapGameType { get; set; } = "Loading {0}, changing gametype to {1}";
 
         public string OnMapNotFound { get; set; } = "No map matching '{0}' could be found.";
-        public string OnMapNameAmbigious { get; set; } = "'{0}' ambigious. More than {1} maps found.";
-        public string OnMapNameAmbigiousHelp { get; set; } = "'{0}' ambigious. Found: {1}";
+        public string OnMapNameAmbiguous { get; set; } = "'{0}' Ambiguous. More than {1} maps found.";
+        public string OnMapNameAmbiguousHelp { get; set; } = "'{0}' Ambiguous. Found: {1}";
 
         public string OnModeNotFound { get; set; } = "No mode matching '{0}' could be found.";
-        public string OnModeNameAmbigious { get; set; } = "'{0}' ambigious. More than {1} mode found.";
-        public string OnModeNameAmbigiousHelp { get; set; } = "'{0}' ambigious. Found: {1}";
+        public string OnModeNameAmbiguous { get; set; } = "'{0}' Ambiguous. More than {1} mode found.";
+        public string OnModeNameAmbiguousHelp { get; set; } = "'{0}' Ambiguous. Found: {1}";
 
         public string OnInvalidMode { get; set; } = "Invalid mode. Allowed: survival, versus, weekly";
         public int HelpMaxMaps { get; set; } = 3;
@@ -56,7 +56,7 @@ namespace KF2Admin.Admin.Commands
 
             try
             {
-                map = StringSearch(Tool.Status.InstalledMaps, command[1], HelpMaxMaps, OnMapNotFound, OnMapNameAmbigious, OnMapNameAmbigiousHelp);
+                map = StringSearch(Tool.Status.InstalledMaps, command[1], HelpMaxMaps, OnMapNotFound, OnMapNameAmbiguous, OnMapNameAmbiguousHelp);
             }
             catch (StringSearchException e)
             {
@@ -68,7 +68,7 @@ namespace KF2Admin.Admin.Commands
             {
                 try
                 {
-                    gamemode = StringSearch(Tool.Status.InstalledGamemodes, command[2], HelpMaxModes, OnModeNotFound, OnModeNameAmbigious, OnModeNameAmbigiousHelp);
+                    gamemode = StringSearch(Tool.Status.InstalledGamemodes, command[2], HelpMaxModes, OnModeNotFound, OnModeNameAmbiguous, OnModeNameAmbiguousHelp);
                 }
                 catch (StringSearchException e)
                 {

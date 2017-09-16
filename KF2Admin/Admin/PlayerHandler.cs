@@ -16,12 +16,24 @@
  */
 using System.Collections.Generic;
 using KF2Admin.Utility;
+using KF2Admin.Config;
 namespace KF2Admin.Admin
 {
     public class PlayerHandler
     {
         private List<Player> playerList = null;
+        private List<Player> statsPlayerList = null;
+
         private AdminTool tool = null;
+        private PlayerHandlerConfiguration config = null;
+        private int lastWave = 0;
+
+        public bool Open()
+        {
+            ConfigSerializer cs = new ConfigSerializer(typeof(PlayerHandlerConfiguration));
+            config = (PlayerHandlerConfiguration)cs.LoadFromFile(Constants.CONFIG_FILE_PLAYERHANDLER, Constants.CONFIG_DIR);
+            return true;
+        }
 
         public PlayerHandler(AdminTool tool)
         {
@@ -31,12 +43,47 @@ namespace KF2Admin.Admin
         public void Update()
         {
             List<Player> newPlayerList = tool.Web.GetPlayerList();
+            if (newPlayerList == null) return;
+
             foreach (Player p in newPlayerList)
             {
                 if (!IsOnline(p)) OnNewPlayerJoin(p);
             }
 
             playerList = newPlayerList;
+        }
+
+        public void UpdateStatus()
+        {
+            if (tool.Status.CurrentWave < lastWave)
+            {
+                Logger.Log("[PLH] New game started.", LogLevel.Info);
+
+                //TODO: liste seems to be empty during map load
+                /*foreach (Player stat in statsPlayerList)
+                {
+                    Player p = null;
+                    try
+                    {
+                        p = GetPlayerByNameMatch(stat.PlayerName, true);       
+                    }
+                    catch (PlayerSearchException e)
+                    {
+                        Logger.Log("[PLH] Stats: Not tracking player {0} : {1}", LogLevel.Verbose, stat.PlayerName, e.Message);
+                        continue;
+                    }
+                    Logger.Log("[PLH] Stats: Writing stats for {0}", LogLevel.Verbose, stat.PlayerName);
+                    p.CopyStats(stat);
+                    tool.Database.TrackStats(p);
+                }*/
+            }
+            else
+            {
+                List<Player> stats = tool.Web.GetPlayerList(true);
+                if(stats != null) statsPlayerList = stats;
+            }
+
+            lastWave = tool.Status.CurrentWave;
         }
 
         public Player GetPlayerByNameMatch(string expression, bool exact = false)
@@ -76,8 +123,9 @@ namespace KF2Admin.Admin
 
         private void OnNewPlayerJoin(Player p)
         {
+            tool.Database.AttachDbInfo(p);
 
-            if (!tool.Database.PlayerExists(p))
+            if (p.IsNew)
             {
                 Logger.Log("[PLH] Registering player '{0}', Steam-ID: '{1}'", LogLevel.Verbose, p.PlayerName, p.SteamId);
                 tool.Database.InsertPlayer(p);
@@ -90,6 +138,15 @@ namespace KF2Admin.Admin
 
             if (playerList != null)
             {
+                if (p.IsNew)
+                {
+                    if (config.WelcomeNewPlayer) tool.Say(config.OnWelcomeNewPlayer, p.PlayerName, p.DatabaseId.ToString());
+                }
+                else
+                {
+                    if (config.WelcomeOldPlayer) tool.Say(config.OnWelcomeOldPlayer, p.PlayerName, p.Visits.ToString());
+                }
+
                 Logger.Log("[PLH] New player '{0}' joined.", LogLevel.Verbose, p.PlayerName);
             }
         }

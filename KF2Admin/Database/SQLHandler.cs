@@ -125,6 +125,31 @@ namespace KF2Admin.Database
             return reader.HasRows;
         }
 
+
+        public void AttachDbInfo(Player player)
+        {
+            string sql =
+             "SELECT " +
+             "id, player_visits, player_last_visit, player_kills " +
+             "FROM " +
+             "kf2_players " +
+             "WHERE kf2_players.player_steam_id = @steam_id";
+
+            DbDataReader reader = Query(sql, "@steam_id", player.SteamId);
+            if (!HasRows(reader))
+            {
+                player.IsNew = true;
+            }
+            else
+            {
+                reader.Read();
+                player.DatabaseId = (long)reader["id"];
+                player.Visits = (long)reader["player_visits"];
+                player.LastVisit = (long)reader["player_last_visit"];
+                player.Kills = (long)reader["player_kills"];
+            }
+        }
+
         public bool PlayerExists(Player player)
         {
             string sql =
@@ -155,10 +180,17 @@ namespace KF2Admin.Database
         {
             string sql =
                 "INSERT INTO kf2_players " +
-                "(player_name, player_steam_id, player_unique_net_id, player_ip_address, player_last_visit) VALUES " +
-                "(@name, @steam_id, @unique_net_id, @ip_address, @timestamp)";
+                "(player_name, player_steam_id, player_unique_net_id, player_ip_address, player_last_visit, player_visits, player_kills) VALUES " +
+                "(@name, @steam_id, @unique_net_id, @ip_address, @timestamp, 1, 0); " +
+                "SELECT last_insert_rowid();";
 
-            NonQuery(sql, "@name", player.PlayerName, "@steam_id", player.SteamId, "@unique_net_id", player.UqNetId, "@ip_address", player.IpAddress.ToString(), "@timestamp", GetTimestamp().ToString());
+            DbDataReader reader = Query(sql, "@name", player.PlayerName, "@steam_id", player.SteamId, "@unique_net_id", player.UqNetId, "@ip_address", player.IpAddress.ToString(), "@timestamp", GetTimestamp().ToString());
+            if (reader != null)
+            {
+                reader.Read();
+                player.DatabaseId = (long)reader[0];
+                reader.Close();
+            }
         }
 
         public void UpdatePlayer(Player player)
@@ -167,7 +199,8 @@ namespace KF2Admin.Database
                 "UPDATE kf2_players SET " +
                 "player_name = @name, " +
                 "player_ip_address = @ip_address, " +
-                "player_last_visit = @timestamp " +
+                "player_last_visit = @timestamp, " +
+                 "player_visits = (player_visits + 1) " +
                 "WHERE player_steam_id = @steam_id";
 
             NonQuery(sql, "@name", player.PlayerName, "@ip_address", player.IpAddress.ToString(), "@timestamp", GetTimestamp().ToString(), "@steam_id", player.SteamId);
@@ -223,9 +256,9 @@ namespace KF2Admin.Database
             return groups;
         }
 
-        public void SetPlayerGroup(Player player, PlayerGroup group, bool delete = false)
+        public long GetPlayerId(Player player)
         {
-            long playerId = 0;
+            long playerId = -1;
             string sql =
                "SELECT " +
                "id " +
@@ -240,10 +273,13 @@ namespace KF2Admin.Database
                 playerId = (long)reader["id"];
                 reader.Close();
             }
-            else
-            {
-                return;
-            }
+            return playerId;
+        }
+
+        public void SetPlayerGroup(Player player, PlayerGroup group, bool delete = false)
+        {
+            string sql = null;
+            long playerId = GetPlayerId(player);
 
             if (delete)
             {
@@ -263,6 +299,16 @@ namespace KF2Admin.Database
             NonQuery(sql, "@group_id", group.Id.ToString(), "@player_id", playerId.ToString());
         }
 
+        public void TrackStats(Player player)
+        {
+            string sql =
+              "UPDATE kf2_players SET " +
+              "player_kills = (player_kills + @kills) " +
+              "WHERE player_steam_id = @steam_id";
+
+            NonQuery(sql, "@kills", player.Kills.ToString(), "@steam_id", player.SteamId);
+        }
+
         public bool GroupListEmpty()
         {
             string sql =
@@ -278,7 +324,6 @@ namespace KF2Admin.Database
         {
             return (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
         }
-
 
     }
 }

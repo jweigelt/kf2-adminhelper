@@ -45,11 +45,10 @@ namespace KF2Admin.Admin.Commands
 
         public void Say(string message, params string[] parameters)
         {
-            message = string.Format(message, parameters);
-            Tool.Web.Say(message);
+            Tool.Say(message, parameters);
         }
 
-        public string StringSearch(List<string> src, string expression, int maxHelp, string onNoMatch, string onAmbigious, string onAmbogiousHelp, bool ignoreCase = true)
+        public string StringSearch(List<string> src, string expression, int maxHelp, string onNoMatch, string onAmbiguous, string onAmbogiousHelp, bool ignoreCase = true)
         {
             List<string> found = new List<string>();
             foreach (string s in src)
@@ -61,7 +60,7 @@ namespace KF2Admin.Admin.Commands
             if (found.Count > 1)
             {
                 if (found.Count <= maxHelp) throw new StringSearchException(onAmbogiousHelp, expression, string.Join(", ", found.ToArray()));
-                else throw new StringSearchException(onAmbigious, expression, maxHelp.ToString());
+                else throw new StringSearchException(onAmbiguous, expression, maxHelp.ToString());
             }
             if (found.Count == 0) throw new StringSearchException(onNoMatch, expression);
 

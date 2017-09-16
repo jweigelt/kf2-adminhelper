@@ -83,11 +83,13 @@ namespace KF2Admin
 
             if (!AutoAnnounce.Open()) return;
             if (!Database.Open()) return;
+            if (!Players.Open()) return;
 
             Scheduler.TickDelay = Config.TickDelay;
             Scheduler.PushRepeatingTask(new RepeatingSchedulerTask(() => Players.Update(), Config.PlayerListUpdateDelay));
             Scheduler.PushRepeatingTask(new RepeatingSchedulerTask(() => Commands.Update(), Config.ChatUpdateDelay));
-
+            Scheduler.PushRepeatingTask(new RepeatingSchedulerTask(() => UpdateGameInfo(), Config.GameUpdateDelay));
+            
             if (!Web.Authenticate()) return;
 
             Status.InstalledMaps = Web.GetInstalledMaps();
@@ -104,6 +106,12 @@ namespace KF2Admin
             Database.Close();
         }
 
+        private void UpdateGameInfo()
+        {
+            Web.UpdateServerStatus(Status);
+            Players.UpdateStatus();
+        }
+
         private void HandleConsole()
         {
             string command = string.Empty;
@@ -113,5 +121,12 @@ namespace KF2Admin
                 if (command == "exit") running = false;
             }
         }
+
+        public void Say(string message, params string[] parameters)
+        {
+            message = string.Format(message, parameters);
+            Web.Say(message);
+        }
+
     }
 }

@@ -26,6 +26,7 @@ namespace KF2Admin
         public const string CONFIG_DIR_COMMANDS = "/cfg/cmd";
         public const string CONFIG_FILE_CORE = "/core.xml";
         public const string CONFIG_FILE_ANNOUNCE = "/announce.xml";
+        public const string CONFIG_FILE_PLAYERHANDLER = "/playerhandler.xml";
 
         public const char COMMAND_SPLITKEY = ' ';
 

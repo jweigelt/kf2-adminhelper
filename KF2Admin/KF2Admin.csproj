@@ -90,6 +90,7 @@
     <Compile Include="Admin\Commands\CmdUnknown.cs" />
     <Compile Include="Admin\Commands\Command.cs" />
     <Compile Include="Admin\Difficulty.cs" />
+    <Compile Include="Config\PlayerHandlerConfiguration.cs" />
     <Compile Include="Database\PlayerGroup.cs" />
     <Compile Include="Admin\PlayerHandler.cs" />
     <Compile Include="Admin\StringSearchException.cs" />

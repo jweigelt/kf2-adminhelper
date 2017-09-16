@@ -49,6 +49,7 @@ namespace KF2Admin.Web
         const string LOCATION_DASHBOARD = "/ServerAdmin/current/info";
         const string LOCATION_PLAYERS = "/ServerAdmin/current/players";
         const string LOCATION_CHAT = "/ServerAdmin/current/chat+frame+data";
+        const string LOCATION_GAME_STATUS = "/ServerAdmin/current+gamesummary";
         const string LOCATION_PLAYERS_ACTION = "/ServerAdmin/current/players+data";
         const string LOCATION_SAY = "/ServerAdmin/current/chat+frame";
         const string LOCATION_MAP_LIST = "/ServerAdmin/settings/maplist";
@@ -133,7 +134,7 @@ namespace KF2Admin.Web
             return true;
         }
 
-        public List<Player> GetPlayerList()
+        public List<Player> GetPlayerList(bool stats = false)
         {
             WebRequest playerRequest = null;
             HtmlElement playerTable = null;
@@ -143,7 +144,7 @@ namespace KF2Admin.Web
 
             try
             {
-                playerRequest = new WebRequest(WebAdminUrl + LOCATION_PLAYERS, "GET", UserAgent, cookieContainer);
+                playerRequest = new WebRequest(WebAdminUrl + (stats ? LOCATION_DASHBOARD : LOCATION_PLAYERS), "GET", UserAgent, cookieContainer);
                 playerRequest.PerformRequest();
 
                 playerTable = HtmlElement.FindElementByAttributeMatch(playerRequest.ResponseContentData, "table", false, "id", "players");
@@ -168,7 +169,7 @@ namespace KF2Admin.Web
                 {
                     try
                     {
-                        playerList.Add(GetPlayer(tr));
+                        playerList.Add(GetPlayer(tr, stats));
                     }
                     catch (Exception e)
                     {
@@ -179,23 +180,40 @@ namespace KF2Admin.Web
             return playerList;
         }
 
-        private Player GetPlayer(HtmlElement tr)
+
+        private Player GetPlayer(HtmlElement tr, bool stats = false)
         {
             List<HtmlElement> cells = HtmlElement.FindElementsByTagMatch(tr.InnerHTML, "td", false);
-            HtmlElement playerId = HtmlElement.FindElementByAttributeMatch(cells[9].InnerHTML, "input", true, "name", "playerid");
-            HtmlElement playerkey = HtmlElement.FindElementByAttributeMatch(cells[9].InnerHTML, "input", true, "name", "playerkey");
+            Player player = null;
 
+            if (stats)
+            {
+                // string perk, int dosh, int health, long kills, ushort ping, bool isAdmin
+                player = new Player(
+                    cells[1].InnerHTML, //Name
+                    cells[2].InnerHTML, //Perk
+                    int.Parse(cells[3].InnerHTML),    //Dosh
+                    (cells[4].InnerHTML.Length > 0 ? int.Parse(cells[4].InnerHTML) : 0),    //Health
+                    long.Parse(cells[5].InnerHTML),    //Kills
+                    ushort.Parse(cells[6].InnerHTML), //Ping
+                    (cells[5].InnerHTML == "Yes"));   //Admin
+            }
+            else
+            {
+                HtmlElement playerId = HtmlElement.FindElementByAttributeMatch(cells[9].InnerHTML, "input", true, "name", "playerid");
+                HtmlElement playerkey = HtmlElement.FindElementByAttributeMatch(cells[9].InnerHTML, "input", true, "name", "playerkey");
 
-            Player player = new Player(
-                cells[1].InnerHTML, //Name
-                cells[4].InnerHTML, //Unique Net Id
-                cells[5].InnerHTML, //Steam Id
-                playerkey.GetAttributeValue("value"),    //Player Key
-                IPAddress.Parse(cells[3].InnerHTML),     //IP Address
-                UInt16.Parse(cells[2].InnerHTML),        //Ping
-                UInt32.Parse(playerId.GetAttributeValue("value")),  //Player Id
-                (cells[7].InnerHTML == "Yes"),  //Admin
-                (cells[8].InnerHTML == "Yes")); //Spectator
+                player = new Player(
+                    cells[1].InnerHTML, //Name
+                    cells[4].InnerHTML, //Unique Net Id
+                    cells[5].InnerHTML, //Steam Id
+                    playerkey.GetAttributeValue("value"),    //Player Key
+                    IPAddress.Parse(cells[3].InnerHTML),     //IP Address
+                    ushort.Parse(cells[2].InnerHTML),        //Ping
+                    uint.Parse(playerId.GetAttributeValue("value")),  //Player Id
+                    (cells[7].InnerHTML == "Yes"),  //Admin
+                    (cells[8].InnerHTML == "Yes")); //Spectator
+            }
 
             return player;
         }
@@ -245,6 +263,7 @@ namespace KF2Admin.Web
 
         public bool Say(string message)
         {
+            Logger.Log("[WEB] Saying '{0}'", LogLevel.Verbose, message);
             try
             {
                 WebRequest sayRequest = new WebRequest(WebAdminUrl + LOCATION_SAY, "POST", UserAgent, cookieContainer, "message=" + message, "application/x-www-form-urlencoded");
@@ -339,7 +358,7 @@ namespace KF2Admin.Web
                     Logger.Log("Failed to change settings. Invalid post params.", LogLevel.Warning);
                     return false; ;
                 }
-                 postData += "&";
+                postData += "&";
                 postData += postParams[i] + "=" + postParams[i + 1];
             }
 
@@ -361,5 +380,27 @@ namespace KF2Admin.Web
         {
             return ChangeGeneral("settings_GameDifficulty", d.Value, "settings_GameDifficulty_raw", d.Value);
         }
+
+        public bool UpdateServerStatus(ServerStatus status)
+        {
+            WebRequest statusRequest = new WebRequest(WebAdminUrl + LOCATION_GAME_STATUS, "POST", UserAgent, cookieContainer, "ajax=1", "application/x-www-form-urlencoded");
+            try
+            {
+                statusRequest.PerformRequest();
+                HtmlElement map = HtmlElement.FindElementsByTagMatch(statusRequest.ResponseContentData, "img", true)[0];
+                HtmlElement wave = HtmlElement.FindElementByAttributeMatch(statusRequest.ResponseContentData, "dt", false, "class", "gs_wave");
+
+                status.CurrentMap = map.GetAttributeValue("alt");
+                status.CurrentWave = int.Parse(wave.InnerHTML.Split(' ')[1]);
+
+            }
+            catch (Exception e)
+            {
+                Logger.Log("Failed to retrieve game status update : {0}", LogLevel.Warning, e.Message);
+                return false;
+            }
+            return true;
+        }
+
     }
 }

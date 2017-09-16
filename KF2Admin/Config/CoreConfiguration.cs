@@ -26,9 +26,11 @@ namespace KF2Admin.Config
         public int TickDelay { get; set; } = 5;
         public int PlayerListUpdateDelay { get; set; } = 5000;
         public int ChatUpdateDelay { get; set; } = 1500;
+        public int GameUpdateDelay { get; set; } = 15000;
 
         public string SQLiteFile { get; set; } = "KF2Admin.sqlite";
 
         public string CommandKey { get; set; } = "!";
+
     }
 }

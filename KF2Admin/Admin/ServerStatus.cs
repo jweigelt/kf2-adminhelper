@@ -22,5 +22,8 @@ namespace KF2Admin.Admin
     {
         public List<string> InstalledMaps { get; set; } = new List<string>();
         public List<string> InstalledGamemodes { get; set; } = new List<string>();
+
+        public int CurrentWave { get; set; } = 0;
+        public string CurrentMap { get; set; } = string.Empty;
     }
 }
