@@ -19,7 +19,7 @@ using System.IO;
 
 namespace KF2Admin.Utility
 {
-    enum LogLevel
+    public enum LogLevel
     {
         Verbose = 0,
         Info = 1,
@@ -31,7 +31,7 @@ namespace KF2Admin.Utility
     static class Logger
     {
         public static bool LogToFile { get; set; } = false;
-        public static LogLevel MinLevel { get; set; } = LogLevel.Verbose;
+        public static LogLevel MinLevel { get; set; } = LogLevel.Info;
         public static string LogFile { get; set; } = "/log.txt";
 
         public static void Log(string message, LogLevel logLevel, params string[] args)
@@ -67,7 +67,7 @@ namespace KF2Admin.Utility
 
             if (LogToFile)
             {
-                File.AppendAllText(LogFile, message);
+                File.AppendAllText(LogFile, message + "\r\n");
             }
         }
     }

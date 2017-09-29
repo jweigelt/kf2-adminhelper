@@ -31,7 +31,7 @@ namespace KF2Admin
         public WebHelper Web { get; }
         public PlayerHandler Players { get; }
         public CommandDispatcher Commands { get; }
-    
+
         AnnounceScheduler AutoAnnounce { get; set; }
 
         public TaskScheduler Scheduler { get; }
@@ -59,14 +59,18 @@ namespace KF2Admin
         {
             running = true;
             ConfigSerializer cs = new ConfigSerializer(typeof(CoreConfiguration));
-            config = (CoreConfiguration) cs.LoadFromFile(Constants.CONFIG_FILE_CORE, Constants.CONFIG_DIR);
+            config = (CoreConfiguration)cs.LoadFromFile(Constants.CONFIG_FILE_CORE, Constants.CONFIG_DIR);
+
+            Logger.LogToFile = config.LogToFile;
+            Logger.MinLevel = config.LogMinimumLevel;
+            Logger.LogFile = config.LogFile;
 
             Database.SQLiteFileName = Config.SQLiteFile;
 
             Web.UserName = config.WebAdminUserName;
             Web.Password = config.WebAdminPassword;
             Web.WebAdminUrl = config.WebAdminURL;
-            Web.UserAgent =  Constants.PRODUCT_NAME + "/" + Constants.PRODUCT_VERSION;
+            Web.UserAgent = Constants.PRODUCT_NAME + "/" + Constants.PRODUCT_VERSION;
 
             Commands.RegisterCommand(typeof(CmdTest), "test.xml");
             Commands.RegisterCommand(typeof(CmdMute), "mute.xml");
@@ -89,7 +93,7 @@ namespace KF2Admin
             Scheduler.PushRepeatingTask(new RepeatingSchedulerTask(() => Players.Update(), Config.PlayerListUpdateDelay));
             Scheduler.PushRepeatingTask(new RepeatingSchedulerTask(() => Commands.Update(), Config.ChatUpdateDelay));
             Scheduler.PushRepeatingTask(new RepeatingSchedulerTask(() => UpdateGameInfo(), Config.GameUpdateDelay));
-            
+
             if (!Web.Authenticate()) return;
 
             Status.InstalledMaps = Web.GetInstalledMaps();
@@ -99,7 +103,10 @@ namespace KF2Admin
 
             Scheduler.Start();
 
+            Logger.Log("[COR] {0} is up. Found {1} installed maps and {2} gamemodes.", LogLevel.Info, Constants.PRODUCT_NAME, Status.InstalledMaps.Count.ToString(), Status.InstalledGamemodes.Count.ToString());
+
             HandleConsole();
+            Logger.Log("[COR] Shutting down...", LogLevel.Info);
 
             Scheduler.Stop();
             Web.Logout();

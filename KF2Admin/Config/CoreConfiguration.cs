@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with kf2 adminhelper.  If not, see <http://www.gnu.org/licenses/>.
  */
-using System;
+using KF2Admin.Utility;
 namespace KF2Admin.Config
 {
     public class CoreConfiguration
@@ -31,6 +31,10 @@ namespace KF2Admin.Config
         public string SQLiteFile { get; set; } = "KF2Admin.sqlite";
 
         public string CommandKey { get; set; } = "!";
+
+        public LogLevel LogMinimumLevel { get; set; } = LogLevel.Info;
+        public bool LogToFile { get; set; } = true;
+        public string LogFile { get; set; } = "log.txt";
 
     }
 }

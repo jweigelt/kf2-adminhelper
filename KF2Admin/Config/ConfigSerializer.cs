@@ -52,7 +52,7 @@ namespace KF2Admin.Config
                 StreamWriter writer = new StreamWriter(fileName);
                 serializer.Serialize(writer, config);
                 writer.Close();
-                Logger.Log("[XML] Stored '{0}'.", LogLevel.Info, fileName);
+                Logger.Log("[XML] Stored '{0}'.", LogLevel.Verbose, fileName);
             }
             catch (Exception ex)
             {
@@ -72,7 +72,7 @@ namespace KF2Admin.Config
                     StreamReader reader = new StreamReader(filePath);
                     config = serializer.Deserialize(reader);
                     reader.Close();
-                    Logger.Log("[XML] XML-File '{0}' parse OK.", LogLevel.Info, fileName);
+                    Logger.Log("[XML] XML-File '{0}' parse OK.", LogLevel.Verbose, fileName);
                 }
                 catch (Exception ex)
                 {
