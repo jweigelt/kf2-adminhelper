@@ -156,7 +156,7 @@ namespace KF2Admin.Web
             catch (Exception e)
             {
                 Logger.Log("[WEB] Playerlist retrieval failed : {0}", LogLevel.Error, e.Message);
-                return playerList;
+                return null;
             }
 
             foreach (HtmlElement tr in playerRows)

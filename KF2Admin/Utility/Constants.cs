@@ -29,6 +29,5 @@ namespace KF2Admin
         public const string CONFIG_FILE_PLAYERHANDLER = "/playerhandler.xml";
 
         public const char COMMAND_SPLITKEY = ' ';
-
     }
 }
