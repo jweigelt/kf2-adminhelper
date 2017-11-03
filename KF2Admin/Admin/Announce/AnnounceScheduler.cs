@@ -1,7 +1,8 @@
 ﻿/* 
- * This file is part of kf2 adminhelper.
+ * This file is part of kf2 adminhelper. (https://github.com/jweigelt/kf2-adminhelper)
+ * Copyright (C) 2017 Jan Weigelt (info@janelo.net)
  * 
- * SWBF2 SADS-Administation Helper is free software: you can redistribute it and/or modify
+ * kf2 adminhelper is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
@@ -46,16 +47,18 @@ namespace KF2Admin.Admin.Announce
 
         private void Update()
         {
-            if(config.AnnounceList.Count <= currentIndex) currentIndex = 0;
+            if (config.AnnounceList.Count <= currentIndex) currentIndex = 0;
+
             string announce = config.AnnounceList[currentIndex].Text;
 
-            if(config.AnnounceList[currentIndex].Parse)
+            if (config.AnnounceList[currentIndex].Parse)
             {
                 //TODO: paar vars parsen
             }
 
             Logger.Log("[ANN] Broadcasting Announce '{0}'", LogLevel.Verbose, announce);
             tool.Web.Say(announce);
+
             currentIndex++;
         }
     }

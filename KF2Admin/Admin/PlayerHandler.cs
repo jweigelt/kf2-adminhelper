@@ -1,7 +1,8 @@
 ﻿/* 
- * This file is part of kf2 adminhelper.
+ * This file is part of kf2 adminhelper. (https://github.com/jweigelt/kf2-adminhelper)
+ * Copyright (C) 2017 Jan Weigelt (info@janelo.net)
  * 
- * SWBF2 SADS-Administation Helper is free software: you can redistribute it and/or modify
+ * kf2 adminhelper is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
@@ -17,12 +18,16 @@
 using System.Collections.Generic;
 using KF2Admin.Utility;
 using KF2Admin.Config;
+using System;
+
 namespace KF2Admin.Admin
 {
     public class PlayerHandler
     {
+
         private List<Player> playerList = null;
         private List<Player> statsPlayerList = null;
+        private List<Player> playerCache = null;
 
         private AdminTool tool = null;
         private PlayerHandlerConfiguration config = null;
@@ -38,6 +43,8 @@ namespace KF2Admin.Admin
         public PlayerHandler(AdminTool tool)
         {
             this.tool = tool;
+            playerCache = new List<Player>();
+            playerList = new List<Player>();
         }
 
         public void Update()
@@ -47,7 +54,22 @@ namespace KF2Admin.Admin
 
             foreach (Player p in newPlayerList)
             {
-                if (!IsOnline(p)) OnNewPlayerJoin(p);
+                if (!IsOnline(p, playerList) && !IsOnline(p, playerCache)) OnNewPlayerJoin(p);
+            }
+
+            foreach (Player p in playerList)
+            {
+                if (!IsOnline(p, newPlayerList)) OnPlayerLeave(p);
+            }
+
+            foreach (Player p in playerCache)
+            {
+                List<Player> newPlayerCache = new List<Player>();
+                if ((DateTime.Now - p.CacheTime).TotalSeconds < config.NewPlayerTimeout)
+                {
+                    newPlayerCache.Add(p);
+                }
+                playerCache = newPlayerCache;
             }
 
             playerList = newPlayerList;
@@ -80,7 +102,7 @@ namespace KF2Admin.Admin
             else
             {
                 List<Player> stats = tool.Web.GetPlayerList(true);
-                if(stats != null) statsPlayerList = stats;
+                if (stats != null) statsPlayerList = stats;
             }
 
             lastWave = tool.Status.CurrentWave;
@@ -108,10 +130,10 @@ namespace KF2Admin.Admin
             return matchingPlayers[0];
         }
 
-        public bool IsOnline(Player player)
+        public bool IsOnline(Player player, List<Player> pl)
         {
-            if (playerList == null) return false;
-            foreach (Player p in playerList)
+            if (pl == null) return false;
+            foreach (Player p in pl)
             {
                 if (p.UqNetId == player.UqNetId)
                 {
@@ -119,6 +141,13 @@ namespace KF2Admin.Admin
                 }
             }
             return false;
+        }
+
+        private void OnPlayerLeave(Player p)
+        {
+            Logger.Log("[PLH] Player '{0}' left", LogLevel.Verbose, p.PlayerName);
+            p.CacheTime = DateTime.Now;
+            playerCache.Add(p);
         }
 
         private void OnNewPlayerJoin(Player p)

@@ -90,14 +90,14 @@
     <Compile Include="Admin\Commands\CmdUnknown.cs" />
     <Compile Include="Admin\Commands\Command.cs" />
     <Compile Include="Admin\Difficulty.cs" />
-    <Compile Include="Config\PlayerHandlerConfiguration.cs" />
+    <Compile Include="Admin\Config\PlayerHandlerConfiguration.cs" />
     <Compile Include="Database\PlayerGroup.cs" />
     <Compile Include="Admin\PlayerHandler.cs" />
     <Compile Include="Admin\StringSearchException.cs" />
     <Compile Include="Admin\PlayerSearchException.cs" />
     <Compile Include="Admin\ServerStatus.cs" />
-    <Compile Include="Config\ConfigSerializer.cs" />
-    <Compile Include="Config\CoreConfiguration.cs" />
+    <Compile Include="Admin\Config\ConfigSerializer.cs" />
+    <Compile Include="Admin\Config\CoreConfiguration.cs" />
     <Compile Include="Database\SQLHandler.cs" />
     <Compile Include="Scheduler\RepeatingSchedulerTask.cs" />
     <Compile Include="Scheduler\SchedulerTask.cs" />
