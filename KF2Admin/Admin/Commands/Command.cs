@@ -16,6 +16,7 @@
  * along with kf2 adminhelper.  If not, see <http://www.gnu.org/licenses/>.
  */
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
 namespace KF2Admin.Admin.Commands
 {
@@ -27,6 +28,8 @@ namespace KF2Admin.Admin.Commands
         public string ParameterSyntax { get; set; }
         public string CommandDescrption { get; set; }
         public bool IsPublic { get; set; } = false;
+
+        [XmlIgnore]
         public AdminTool Tool { get; set; }
 
         public virtual string Usage

@@ -18,7 +18,7 @@
 using System.Collections.Generic;
 namespace KF2Admin.Web
 {
-    public class HtmlElement
+    class HtmlElement
     {
         public string InnerHTML { get; }
         public string Header { get; }

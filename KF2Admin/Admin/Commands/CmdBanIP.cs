@@ -15,10 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with kf2 adminhelper.  If not, see <http://www.gnu.org/licenses/>.
  */
+using System.Xml.Serialization;
 namespace KF2Admin.Admin.Commands
 {
     public class CmdBanIP : PlayerCommand
     {
+        [XmlIgnore]
+        public const string FILE_NAME = "./cfg/cmd/banip.xml";
+
+        [XmlIgnore]
+        public const string RESOURCE_NAME = "KF2Admin.Resources.cfg.cmd.banip.xml";
+
         public CmdBanIP()
         {
             CommandAlias = "ipban";

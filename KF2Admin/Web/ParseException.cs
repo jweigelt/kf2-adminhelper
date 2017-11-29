@@ -18,7 +18,7 @@
 using System;
 namespace KF2Admin.Web
 {
-    public class ParseException : Exception
+    class ParseException : Exception
     {
 
         public ParseException(string message, params string[] fmt) : base(string.Format(message, fmt)) { }

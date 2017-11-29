@@ -15,21 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with kf2 adminhelper.  If not, see <http://www.gnu.org/licenses/>.
  */
-using System.Collections.Generic;
 using System.Xml.Serialization;
-
-namespace KF2Admin.Admin.Announce
+namespace KF2Admin.Config
 {
-    public class AnnounceConfiguration
+    public class PlayerHandlerConfiguration
     {
         [XmlIgnore]
-        public const string FILE_NAME = "./cfg/announce.xml";
+        public const string FILE_NAME = "./cfg/playerhandler.xml";
 
         [XmlIgnore]
-        public const string RESOURCE_NAME = "KF2Admin.Resources.cfg.announce.xml";
+        public const string RESOURCE_NAME = "KF2Admin.Resources.cfg.playerhandler.xml";
 
-        public bool Enable { get; set; } = false;
-        public int AnnounceDelay { get; set; } = 60000 * 10;
-        public List<Announce> AnnounceList { get; set; } = new List<Announce>();
+        public int NewPlayerTimeout { get; set; } = 120;
+
+        public bool WelcomeNewPlayer { get; set; } = true;
+        public string OnWelcomeNewPlayer { get; set; } = "Welcome '{0}', Player #{1}";
+
+        public bool WelcomeOldPlayer { get; set; } = true;
+        public string OnWelcomeOldPlayer { get; set; } = "Welcome back, {0}, played {1} times on this server.";
     }
 }

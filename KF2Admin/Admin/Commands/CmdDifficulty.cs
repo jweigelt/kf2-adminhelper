@@ -16,11 +16,17 @@
  * along with kf2 adminhelper.  If not, see <http://www.gnu.org/licenses/>.
  */
 using System.Collections.Generic;
-
+using System.Xml.Serialization;
 namespace KF2Admin.Admin.Commands
 {
     public class CmdDifficulty : Command
     {
+        [XmlIgnore]
+        public const string FILE_NAME = "./cfg/cmd/difficulty.xml";
+
+        [XmlIgnore]
+        public const string RESOURCE_NAME = "KF2Admin.Resources.cfg.cmd.difficulty.xml";
+
         public string OnNoDifficultyMatch { get; set; } = "Unkown difficulty '{0}'";
         public string OnChangeDifficulty { get; set; } = "Changing game difficulty to '{0}'";
 

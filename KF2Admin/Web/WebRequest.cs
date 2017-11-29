@@ -22,7 +22,7 @@ using System.Text;
 
 namespace KF2Admin.Web
 {
-    public class WebRequest
+    class WebRequest
     {
         private HttpWebRequest request = null;
         private HttpWebResponse response = null;

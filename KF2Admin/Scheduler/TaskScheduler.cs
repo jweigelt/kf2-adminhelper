@@ -17,22 +17,25 @@
  */
 using System.Threading;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace KF2Admin.Scheduler
 {
     public class TaskScheduler
     {
         public int TickDelay { get; set; } = 10;
-        private Queue<SchedulerTask> taskQueue;
+        private ConcurrentQueue<SchedulerTask> taskQueue;
         private List<RepeatingSchedulerTask> repeatingTasks;
+        private Mutex mtx;
 
         private Thread workThread;
         private bool running;
 
         public TaskScheduler()
         {
-            taskQueue = new Queue<SchedulerTask>();
-            repeatingTasks = new List<RepeatingSchedulerTask>(); ;
+            taskQueue = new ConcurrentQueue<SchedulerTask>();
+            repeatingTasks = new List<RepeatingSchedulerTask>();
+            mtx = new Mutex();
         }
 
         public void Start()
@@ -59,7 +62,9 @@ namespace KF2Admin.Scheduler
 
         public void PushRepeatingTask(RepeatingSchedulerTask task)
         {
+            mtx.WaitOne();
             repeatingTasks.Add(task);
+            mtx.ReleaseMutex();
         }
 
         private void DoWork()
@@ -68,13 +73,19 @@ namespace KF2Admin.Scheduler
             {
                 if (taskQueue.Count > 0)
                 {
-                    taskQueue.Dequeue().Run();
+                    SchedulerTask t;
+                    while(!taskQueue.TryDequeue(out t)) Thread.Sleep(TickDelay);
+                    t.Run();
                 }
 
-                foreach (RepeatingSchedulerTask task in this.repeatingTasks)
+                mtx.WaitOne();
+                try
                 {
-                    task.Tick();
+                    foreach (RepeatingSchedulerTask task in repeatingTasks) task.Tick();
                 }
+                catch { }
+                mtx.ReleaseMutex();
+
                 Thread.Sleep(TickDelay);
             }
         }

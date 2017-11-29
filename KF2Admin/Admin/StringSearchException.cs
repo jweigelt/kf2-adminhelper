@@ -19,7 +19,7 @@ using System;
 
 namespace KF2Admin.Admin
 {
-    public class StringSearchException : Exception
+    class StringSearchException : Exception
     {
         public StringSearchException(string message, params string[] fmt) : base(string.Format(message, fmt)) { }
     }

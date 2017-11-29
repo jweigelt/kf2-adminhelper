@@ -16,11 +16,17 @@
  * along with kf2 adminhelper.  If not, see <http://www.gnu.org/licenses/>.
  */
 using KF2Admin.Database;
-using System.Collections.Generic;
+using System.Xml.Serialization;
 namespace KF2Admin.Admin.Commands
 {
     public class CmdGimmeAdmin : Command
     {
+        [XmlIgnore]
+        public const string FILE_NAME = "./cfg/cmd/gimmeadmin.xml";
+
+        [XmlIgnore]
+        public const string RESOURCE_NAME = "KF2Admin.Resources.cfg.cmd.gimmeadmin.xml";
+
         public string OnGrantAll { get; set; } = "Granting all permissions on '{0}'. Have fun!";
         public string OnAlreadyRan { get; set; } = "Command was already used.";
         public long GroupId { get; set; } = 0;

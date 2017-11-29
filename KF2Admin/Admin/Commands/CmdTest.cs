@@ -17,10 +17,17 @@
  */
 using KF2Admin.Database;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 namespace KF2Admin.Admin.Commands
 {
     public class CmdTest : Command
     {
+        [XmlIgnore]
+        public const string FILE_NAME = "./cfg/cmd/test.xml";
+
+        [XmlIgnore]
+        public const string RESOURCE_NAME = "KF2Admin.Resources.cfg.cmd.test.xml";
+
         public string OnTest { get; set; } = "Test OK. Usergroups: {0}";
 
         public CmdTest()

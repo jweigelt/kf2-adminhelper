@@ -15,14 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with kf2 adminhelper.  If not, see <http://www.gnu.org/licenses/>.
  */
-using System;
-using KF2Admin.Config;
 using KF2Admin.Utility;
 using KF2Admin.Scheduler;
 
 namespace KF2Admin.Admin.Announce
 {
-    public class AnnounceScheduler
+    class AnnounceScheduler
     {
         private AdminTool tool = null;
         private AnnounceConfiguration config = null;
@@ -35,8 +33,7 @@ namespace KF2Admin.Admin.Announce
 
         public bool Open()
         {
-            ConfigSerializer cs = new ConfigSerializer(typeof(AnnounceConfiguration));
-            config = (AnnounceConfiguration)cs.LoadFromFile(Constants.CONFIG_FILE_ANNOUNCE, Constants.CONFIG_DIR);
+            config = tool.FileIO.ReadConfig<AnnounceConfiguration>();
 
             if (config.Enable && config.AnnounceList.Count > 0)
             {
@@ -48,18 +45,9 @@ namespace KF2Admin.Admin.Announce
         private void Update()
         {
             if (config.AnnounceList.Count <= currentIndex) currentIndex = 0;
-
-            string announce = config.AnnounceList[currentIndex].Text;
-
-            if (config.AnnounceList[currentIndex].Parse)
-            {
-                //TODO: paar vars parsen
-            }
-
-            Logger.Log("[ANN] Broadcasting Announce '{0}'", LogLevel.Verbose, announce);
+            string announce = config.AnnounceList[currentIndex++].ParseText();
+            Logger.Log(LogLevel.Verbose, "[ANN] Broadcasting Announce '{0}'", announce);
             tool.Web.Say(announce);
-
-            currentIndex++;
         }
     }
 }

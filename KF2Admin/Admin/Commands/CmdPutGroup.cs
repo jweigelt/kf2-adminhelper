@@ -17,10 +17,17 @@
  */
 using KF2Admin.Database;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 namespace KF2Admin.Admin.Commands
 {
     public class CmdPutGroup : Command
     {
+        [XmlIgnore]
+        public const string FILE_NAME = "./cfg/cmd/putgroup.xml";
+
+        [XmlIgnore]
+        public const string RESOURCE_NAME = "KF2Admin.Resources.cfg.cmd.putgroup.xml";
+
         public string OnNoPlayer { get; set; } = "Can't set group : {0}";
         public string OnNoGroup { get; set; } = "Group '{0}' doesn't exist.";
         public string OnAlreadyDone { get; set; } = "'{0}' is already a member of '{1}'";

@@ -87,17 +87,17 @@ namespace KF2Admin.Web
             string token = null;
             string authString = null;
 
-            Logger.Log("[WEB] Logging in...", LogLevel.Verbose);
+            Logger.Log(LogLevel.Verbose, "[WEB] Logging in...");
 
             try
             {
-                Logger.Log("[WEB] Requesting session id and login token...", LogLevel.Verbose);
+                Logger.Log(LogLevel.Verbose, "[WEB] Requesting session id and login token...");
                 initialRequest = new WebRequest(WebAdminUrl + LOCATION_LOGIN, "GET", UserAgent, cookieContainer);
                 initialRequest.PerformRequest();
 
                 tokenField = HtmlElement.FindElementByAttributeMatch(initialRequest.ResponseContentData, "input", true, "name", "token");
                 token = tokenField.GetAttributeValue("value");
-                Logger.Log("[WEB] Received our token for this login : '{0}'", LogLevel.Verbose, token);
+                Logger.Log(LogLevel.Verbose, "[WEB] Received our token for this login : '{0}'", token);
 
                 authString = string.Format(LOGIN_POSTDATA, token, string.Empty, UserName, Password, LOGIN_DURATION_INF);
                 loginRequest = new WebRequest(WebAdminUrl + LOCATION_LOGIN, "POST", UserAgent, cookieContainer, authString, "application/x-www-form-urlencoded");
@@ -110,17 +110,17 @@ namespace KF2Admin.Web
             }
             catch (Exception e)
             {
-                Logger.Log("[WEB] Authentication failed : {0}", LogLevel.Error, e.Message);
+                Logger.Log(LogLevel.Error, "[WEB] Authentication failed : {0}", e.Message);
                 return false;
             }
 
-            Logger.Log("[WEB] Login OK.", LogLevel.Info);
+            Logger.Log(LogLevel.Info, "[WEB] Login OK.");
             return true;
         }
 
         public bool Logout()
         {
-            Logger.Log("[WEB] Logging out...", LogLevel.Info);
+            Logger.Log(LogLevel.Info, "[WEB] Logging out...");
             WebRequest logoutRequest = new WebRequest(WebAdminUrl + LOCATION_LOGOUT, "GET", UserAgent, cookieContainer);
             try
             {
@@ -128,10 +128,10 @@ namespace KF2Admin.Web
             }
             catch (Exception e)
             {
-                Logger.Log("[WEB] Logout failed : {0}", LogLevel.Error, e.Message);
+                Logger.Log(LogLevel.Error, "[WEB] Logout failed : {0}", e.Message);
                 return false;
             }
-            Logger.Log("[WEB] Logout OK.", LogLevel.Info);
+            Logger.Log(LogLevel.Info, "[WEB] Logout OK.");
             return true;
         }
 
@@ -156,7 +156,7 @@ namespace KF2Admin.Web
             }
             catch (Exception e)
             {
-                Logger.Log("[WEB] Playerlist retrieval failed : {0}", LogLevel.Error, e.Message);
+                Logger.Log(LogLevel.Error, "[WEB] Playerlist retrieval failed : {0}", e.Message);
                 return null;
             }
 
@@ -174,7 +174,7 @@ namespace KF2Admin.Web
                     }
                     catch (Exception e)
                     {
-                        Logger.Log("[WEB] Error parsing player: {0}", LogLevel.Warning, e.Message);
+                        Logger.Log(LogLevel.Warning, "[WEB] Error parsing player: {0}", e.Message);
                     }
                 }
             }
@@ -232,14 +232,14 @@ namespace KF2Admin.Web
                     string playerName = HtmlElement.FindElementByAttributeMatch(chatRequest.ResponseContentData, "span", false, "class", "username ").InnerHTML;
                     string message = HtmlElement.FindElementByAttributeMatch(chatRequest.ResponseContentData, "span", false, "class", "message").InnerHTML;
 
-                    Logger.Log("[WEB] #{0}: {1}", LogLevel.Info, playerName, message);
+                    Logger.Log(LogLevel.Info, "[WEB] #{0}: {1}", playerName, message);
                     return new ChatMessage(playerName, message);
                 }
 
             }
             catch (Exception e)
             {
-                Logger.Log("Failed to retrieve chat update : {0}", LogLevel.Warning, e.Message);
+                Logger.Log(LogLevel.Warning, "Failed to retrieve chat update : {0}", e.Message);
             }
 
             return null;
@@ -257,14 +257,14 @@ namespace KF2Admin.Web
             }
             catch (Exception e)
             {
-                Logger.Log("Failed to perform action on player '{0}' : {1}", LogLevel.Warning, player.PlayerName, e.Message);
+                Logger.Log(LogLevel.Warning, "Failed to perform action on player '{0}' : {1}", player.PlayerName, e.Message);
                 return false;
             }
         }
 
         public bool Say(string message)
         {
-            Logger.Log("[WEB] Saying '{0}'", LogLevel.Verbose, message);
+            Logger.Log(LogLevel.Verbose, "[WEB] Saying '{0}'", message);
             try
             {
                 WebRequest sayRequest = new WebRequest(WebAdminUrl + LOCATION_SAY, "POST", UserAgent, cookieContainer, "message=" + message, "application/x-www-form-urlencoded");
@@ -273,7 +273,7 @@ namespace KF2Admin.Web
             }
             catch (Exception e)
             {
-                Logger.Log("Failed to say '{0}' : {1}", LogLevel.Warning, message, e.Message);
+                Logger.Log(LogLevel.Warning, "Failed to say '{0}' : {1}", message, e.Message);
                 return false;
             }
         }
@@ -290,7 +290,7 @@ namespace KF2Admin.Web
             }
             catch (Exception e)
             {
-                Logger.Log("Failed to retrieve map list {0}", LogLevel.Warning, e.Message);
+                Logger.Log(LogLevel.Warning, "Failed to retrieve map list {0}", e.Message);
                 return null;
             }
         }
@@ -314,7 +314,7 @@ namespace KF2Admin.Web
             }
             catch (Exception e)
             {
-                Logger.Log("Failed to retrieve gamemode list {0}", LogLevel.Warning, e.Message);
+                Logger.Log(LogLevel.Warning, "Failed to retrieve gamemode list {0}", e.Message);
                 return null;
             }
             return modes;
@@ -344,7 +344,7 @@ namespace KF2Admin.Web
             }
             catch (Exception e)
             {
-                Logger.Log("Failed to change map {0}", LogLevel.Warning, e.Message);
+                Logger.Log(LogLevel.Warning, "Failed to change map {0}", e.Message);
                 return false;
             }
         }
@@ -356,7 +356,7 @@ namespace KF2Admin.Web
             {
                 if (postParams.Length <= (i + 1))
                 {
-                    Logger.Log("Failed to change settings. Invalid post params.", LogLevel.Warning);
+                    Logger.Log(LogLevel.Warning, "Failed to change settings. Invalid post params.");
                     return false; ;
                 }
                 postData += "&";
@@ -372,7 +372,7 @@ namespace KF2Admin.Web
             }
             catch (Exception e)
             {
-                Logger.Log("Failed to change settings {0}", LogLevel.Warning, e.Message);
+                Logger.Log(LogLevel.Warning, "Failed to change settings {0}", e.Message);
                 return false;
             }
         }
@@ -381,6 +381,12 @@ namespace KF2Admin.Web
         {
             return ChangeGeneral("settings_GameDifficulty", d.Value, "settings_GameDifficulty_raw", d.Value);
         }
+
+        public bool ChangeGameLength(GameLength l)
+        {
+            return ChangeGeneral("settings_GameLength", l.Value);
+        }
+
 
         public bool UpdateServerStatus(ServerStatus status)
         {
@@ -397,7 +403,7 @@ namespace KF2Admin.Web
             }
             catch (Exception e)
             {
-                Logger.Log("Failed to retrieve game status update : {0}", LogLevel.Warning, e.Message);
+                Logger.Log(LogLevel.Warning, "Failed to retrieve game status update : {0}", e.Message);
                 return false;
             }
             return true;

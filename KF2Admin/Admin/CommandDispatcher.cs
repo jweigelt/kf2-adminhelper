@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using KF2Admin.Utility;
-using KF2Admin.Config;
 using KF2Admin.Admin.Commands;
 
 namespace KF2Admin.Admin
@@ -35,7 +34,7 @@ namespace KF2Admin.Admin
         {
             this.tool = tool;
             Commands = new List<Command>();
-            UnknownCommand = LoadCommand(typeof(CmdUnknown), "unknown.xml");
+            UnknownCommand = LoadCommand<CmdUnknown>();
         }
 
         ~CommandDispatcher()
@@ -75,7 +74,7 @@ namespace KF2Admin.Admin
                     }
                     catch (Exception e)
                     {
-                        Logger.Log("[CMD] Access to {0} denied : {1}", LogLevel.Info, command.CommandAlias, e.Message);
+                        Logger.Log(LogLevel.Info, "[CMD] Access to {0} denied : {1}", command.CommandAlias, e.Message);
                         return;
                     }
 
@@ -83,33 +82,33 @@ namespace KF2Admin.Admin
                     //check syntax
                     if (!command.CheckSyntax(commandArray, player))
                     {
-                        Logger.Log("[CMD] Syntax error running command {0} [{1}]", LogLevel.Info, msg.Message, msg.PlayerName);
+                        Logger.Log(LogLevel.Info, "[CMD] Syntax error running command {0} [{1}]", msg.Message, msg.PlayerName);
                         command.Say(command.ParameterSyntax);
                         return;
                     }
 
                     //run
-                    Logger.Log("[CMD] Running command {0} [{1}]", LogLevel.Info, msg.Message, msg.PlayerName);
+                    Logger.Log(LogLevel.Info, "[CMD] Running command {0} [{1}]", msg.Message, msg.PlayerName);
                     command.RunCommand(commandArray, player);
                     return;
                 }
             }
 
-            Logger.Log("[CMD] Unknown command '{0}' [{1}]", LogLevel.Info, commandArray[0], msg.PlayerName);
+            Logger.Log(LogLevel.Info, "[CMD] Unknown command '{0}' [{1}]", commandArray[0], msg.PlayerName);
             UnknownCommand.RunCommand(commandArray, player);
         }
 
-        private Command LoadCommand(Type commandType, string xmlConfig)
+        private Command LoadCommand<T>() where T : Command, new()
         {
-            ConfigSerializer cs = new ConfigSerializer(commandType);
-            Command c = (Command)cs.LoadFromFile("/" + xmlConfig, Constants.CONFIG_DIR_COMMANDS);
+            T c = tool.FileIO.ReadConfig<T>();
             c.Tool = tool;
+
             return c;
         }
 
-        public void RegisterCommand(Type commandType, string xmlConfig)
+        public void RegisterCommand<T>() where T : Command, new()
         {
-            Commands.Add(LoadCommand(commandType, xmlConfig));
+            Commands.Add(LoadCommand<T>());
         }
     }
 }

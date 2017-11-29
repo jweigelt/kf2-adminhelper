@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  KF2Admin core configuration
+  note: If you want to generate a fresh XML-File just delete it and run the program.
+-->
+<CoreConfiguration xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <!--
+    WebAdmin Settings
+    WebAdminURL: URL of your server's WebAdmin
+    WebAdminUserName: WebAdmin user (default: admin)
+    WebAdminPassword: Your server's admin password
+  -->
+  <WebAdminURL>http://blinky.janelo.net:8080</WebAdminURL>
+  <WebAdminUserName>admin</WebAdminUserName>
+  <WebAdminPassword>1234</WebAdminPassword>
+
+  <!--If you just want a quick setup leave the rest of the file untouched-->
+  
+  <!--
+    Update timings
+    TickDelay: Controls tickrate of task scheduler
+    PlayerListUpdateDelay: delay between playerlist updates
+    ChatUpdateDelay: delay between chat updates
+    GameUpdateDelay: delay between stats updates
+  -->
+  <TickDelay>5</TickDelay>
+  <PlayerListUpdateDelay>5000</PlayerListUpdateDelay>
+  <ChatUpdateDelay>2000</ChatUpdateDelay>
+  <GameUpdateDelay>15000</GameUpdateDelay>
+
+  <!--SQL-Db Filename (use ./ ... for relative path)-->
+  <SQLiteFile>./KF2Admin.sqlite</SQLiteFile>
+
+  <!--char starting command input-->
+  <CommandKey>!</CommandKey>
+
+  <!--
+    LogMinimumLevel: minimum level to be logged
+      - VerboseSQL
+      - Verbose
+      - Info
+      - Warning
+      - Error
+    LogToFile: Write console output to file
+    LogFile: path to logfile (use ./ ... for relative path)
+  -->
+  <LogMinimumLevel>Info</LogMinimumLevel>
+  <LogToFile>true</LogToFile>
+  <LogFile>./log.txt</LogFile>
+  
+</CoreConfiguration>

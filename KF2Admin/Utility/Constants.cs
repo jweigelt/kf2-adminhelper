@@ -17,7 +17,7 @@
  */
 namespace KF2Admin
 {
-    public class Constants
+    class Constants
     {
         public const string PRODUCT_NAME = "KF2Admin";
         public const string PRODUCT_VERSION = "1.0";
@@ -30,5 +30,8 @@ namespace KF2Admin
         public const string CONFIG_FILE_PLAYERHANDLER = "/playerhandler.xml";
 
         public const char COMMAND_SPLITKEY = ' ';
+
+        public const int MUTEX_LOCK_TIMEOUT = 10;
+
     }
 }

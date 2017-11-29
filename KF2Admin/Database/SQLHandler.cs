@@ -18,38 +18,56 @@
 using System;
 using System.Data;
 using System.Data.SQLite;
+
 using System.Data.Common;
+using System.Collections.Generic;
+
+using MySql.Data;
+using MySql.Data.MySqlClient;
+
 using KF2Admin.Utility;
 using KF2Admin.Admin;
-using System.Collections.Generic;
+
 
 namespace KF2Admin.Database
 {
     public class SQLHandler
     {
-        private SQLiteConnection connection = null;
+        public enum DbType { SQLite, MySQL }
+
+        public DbType SQLType { get; set; } = DbType.SQLite;
         public string SQLiteFileName { get; set; } = "KF2Admin.sqlite";
+        public string MySQLHostName { get; set; } = "localhost:3306";
+        public string MySQLDbName { get; set; } = "kf2admin";
+        public string MySQLUserName { get; set; } = "root";
+        public string MySQLPassword { get; set; } = "";
+
+        private DbConnection connection = null;
 
         public bool Open()
         {
             if (connection != null)
             {
-                Logger.Log("[SQL] Database connection already open", LogLevel.Warning);
+                Logger.Log(LogLevel.Warning, "[SQL] Database connection already open");
                 return true;
             }
 
-            Logger.Log("[SQL] Opening database connection...", LogLevel.Verbose);
-            connection = new SQLiteConnection(string.Format("Data Source={0};", SQLiteFileName));
+            Logger.Log(LogLevel.Verbose, "[SQL] Opening database connection...");
+
+            if (SQLType == DbType.SQLite)
+                connection = new SQLiteConnection(string.Format("Data Source={0};", SQLiteFileName));
+            else
+                connection = new MySqlConnection(string.Format("SERVER={0};DATABASE={1};UID={2};PASSWORD={3}", MySQLHostName, MySQLDbName, MySQLUserName, MySQLPassword));
 
             try
             {
                 connection.Open();
-                Logger.Log("[SQL] Database OK.", LogLevel.Info);
+                Logger.Log(LogLevel.Info, "[SQL] Database OK.");
                 return true;
             }
             catch (Exception e)
             {
-                Logger.Log("[SQL] Couldn't open database : {0}", LogLevel.Error, e.Message);
+                Logger.Log(LogLevel.Error, "[SQL] Couldn't open database : {0}", e.Message);
                 return false;
             }
 
@@ -59,7 +77,7 @@ namespace KF2Admin.Database
         {
             if (connection != null)
             {
-                Logger.Log("[SQL] Closing Database...", LogLevel.Info);
+                Logger.Log(LogLevel.Info, "[SQL] Closing Database...");
                 connection.Close();
                 connection = null;
             }
@@ -67,7 +85,7 @@ namespace KF2Admin.Database
 
         DbDataReader Query(string query, params string[] parameters)
         {
-            Logger.Log("[SQL] Query: {0}", LogLevel.Verbose, query);
+            Logger.Log(LogLevel.VerboseSQL, "[SQL] Query: {0}", query);
             DbDataReader reader = null;
             try
             {
@@ -82,14 +100,14 @@ namespace KF2Admin.Database
                     if (!reader.IsClosed) reader.Close();
                 }
 
-                Logger.Log("[SQL] Query failed : {0}", LogLevel.Error, e.Message);
+                Logger.Log(LogLevel.Error, "[SQL] Query failed : {0}", e.Message);
                 return null;
             }
         }
 
         void NonQuery(string query, params string[] parameters)
         {
-            Logger.Log("[SQL] NonQuery: {0}", LogLevel.Verbose, query);
+            Logger.Log(LogLevel.VerboseSQL, "[SQL] NonQuery: {0}", query);
             try
             {
                 if (connection.State != ConnectionState.Open) connection.Open();
@@ -97,23 +115,30 @@ namespace KF2Admin.Database
             }
             catch (Exception e)
             {
-                Logger.Log("[SQL] Query failed : {0}", LogLevel.Error, e.Message);
+                Logger.Log(LogLevel.Error, "[SQL] Query failed : {0}", e.Message);
             }
         }
 
-        private SQLiteCommand BuildCommand(string query, params string[] parameters)
+        private DbCommand BuildCommand(string query, params string[] parameters)
         {
-            SQLiteCommand command = new SQLiteCommand(query, connection);
+            DbCommand command;
+            if (SQLType == DbType.SQLite)
+                command = new SQLiteCommand(query, (SQLiteConnection)connection);
+            else
+                command = new MySqlCommand(query, (MySqlConnection)connection);
 
             for (int i = 0; i < parameters.Length; i += 2)
             {
                 if (parameters.Length < i)
                 {
-                    Logger.Log("[SQL] No value for parameter '{0}' specified", LogLevel.Error, parameters[i]);
+                    Logger.Log(LogLevel.Error, "[SQL] No value for parameter '{0}' specified", parameters[i]);
                 }
                 else
                 {
-                    command.Parameters.AddWithValue(parameters[i], parameters[i + 1]);
+                    DbParameter p = command.CreateParameter();
+                    p.ParameterName = parameters[i];
+                    p.Value = parameters[i + 1];
+                    command.Parameters.Add(p);
                 }
             }
             command.Prepare();
@@ -125,7 +150,6 @@ namespace KF2Admin.Database
             if (reader == null) return false;
             return reader.HasRows;
         }
-
 
         public void AttachDbInfo(Player player)
         {
@@ -232,7 +256,6 @@ namespace KF2Admin.Database
 
             return groups;
         }
-
 
         public List<PlayerGroup> GetAllPlayerGroups()
         {

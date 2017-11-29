@@ -16,59 +16,73 @@
  * along with kf2 adminhelper.  If not, see <http://www.gnu.org/licenses/>.
  */
 using System;
+using System.Threading;
 using System.IO;
 
 namespace KF2Admin.Utility
 {
     public enum LogLevel
     {
-        Verbose = 0,
-        Info = 1,
-        Warning = 2,
-        Error = 3,
-        Banner = 4
+        VerboseSQL = 0,
+        Verbose = 1,
+        Info = 2,
+        Warning = 3,
+        Error = 4,
     }
 
     static class Logger
     {
+        private static Mutex mtx = new Mutex();
+
+        public static LogLevel MinLevel { get; set; } = LogLevel.Verbose;
         public static bool LogToFile { get; set; } = false;
-        public static LogLevel MinLevel { get; set; } = LogLevel.Info;
         public static string LogFile { get; set; } = "/log.txt";
 
-        public static void Log(string message, LogLevel logLevel, params string[] args)
+        public static void Log(LogLevel logLevel, string message, params string[] args)
         {
-            if (logLevel < MinLevel && logLevel != LogLevel.Banner) return;
+
+            string status = string.Empty;
+            string time = string.Empty;
+
+            if (logLevel < MinLevel) return;
             message = string.Format(message, args);
+            message = "| " + message;
 
-            if (logLevel == LogLevel.Banner)
+            time = "[" + DateTime.Now.ToString() + "] ";
+
+            if (mtx.WaitOne(Constants.MUTEX_LOCK_TIMEOUT))
             {
+                Console.Write(time);
+                switch (logLevel)
+                {
+                    case LogLevel.Verbose:
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        status = "DEBUG ";
+                        break;
+                    case LogLevel.Info:
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        status = "INFO  ";
+                        break;
+                    case LogLevel.Warning:
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        status = "WARN  ";
+                        break;
+                    case LogLevel.Error:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        status = "ERROR ";
+                        break;
+                }
+
+                Console.Write(status);
+                Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine(message);
-                return;
-            }
 
-            switch (logLevel)
-            {
-                case LogLevel.Verbose:
-                    message = "DEBUG | " + message;
-                    break;
-                case LogLevel.Info:
-                    message = "INFO  | " + message;
-                    break;
-                case LogLevel.Warning:
-                    message = "WARN  | " + message;
-                    break;
-                case LogLevel.Error:
-                    message = "ERROR | " + message;
-                    break;
-            }
+                if (LogToFile)
+                {
+                    File.AppendAllText(LogFile, time + status + message + "\r\n");
 
-            message = "[" + DateTime.Now.ToString() + "] " + message;
-
-            Console.WriteLine(message);
-
-            if (LogToFile)
-            {
-                File.AppendAllText(LogFile, message + "\r\n");
+                }
+                mtx.ReleaseMutex();
             }
         }
     }

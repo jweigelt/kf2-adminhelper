@@ -16,11 +16,17 @@
  * along with kf2 adminhelper.  If not, see <http://www.gnu.org/licenses/>.
  */
 using KF2Admin.Database;
-using System.Collections.Generic;
+using System.Xml.Serialization;
 namespace KF2Admin.Admin.Commands
 {
     public class CmdRmGroup : CmdPutGroup
     {
+        [XmlIgnore]
+        public new const string FILE_NAME = "./cfg/cmd/rmgroup.xml";
+
+        [XmlIgnore]
+        public new const string RESOURCE_NAME = "KF2Admin.Resources.cfg.cmd.rmgroup.xml";
+
         public CmdRmGroup()
         {
             CommandAlias = "rmgroup";

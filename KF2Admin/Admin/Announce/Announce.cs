@@ -15,10 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with kf2 adminhelper.  If not, see <http://www.gnu.org/licenses/>.
  */
+using KF2Admin.Utility;
 namespace KF2Admin.Admin.Announce
 {
     public class Announce
     {
+        public string ParseText()
+        {
+            return (Parse ? StringUtil.DateTagReplace(Text) : Text);
+        }
+
         public string Text { get; set; } = string.Empty;
         public bool Parse { get; set; } = false;
     }

@@ -15,11 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with kf2 adminhelper.  If not, see <http://www.gnu.org/licenses/>.
  */
-using System.Collections.Generic;
+using System.Xml.Serialization;
 namespace KF2Admin.Admin.Commands
 {
     public class CmdMap : Command
     {
+        [XmlIgnore]
+        public const string FILE_NAME = "./cfg/cmd/map.xml";
+
+        [XmlIgnore]
+        public const string RESOURCE_NAME = "KF2Admin.Resources.cfg.cmd.map.xml";
+
         public string OnMap { get; set; } = "Loading {0}";
         public string OnMapGameType { get; set; } = "Loading {0}, changing gametype to {1}";
 

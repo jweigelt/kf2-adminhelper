@@ -15,10 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with kf2 adminhelper.  If not, see <http://www.gnu.org/licenses/>.
  */
+using System.Xml.Serialization;
 namespace KF2Admin.Admin.Commands
 {
     public class CmdUnknown : Command
     {
+        [XmlIgnore]
+        public const string FILE_NAME = "./cfg/cmd/unknown.xml";
+
+        [XmlIgnore]
+        public const string RESOURCE_NAME = "KF2Admin.Resources.cfg.cmd.unknown.xml";
+
         public string OnInvalidUserInput { get; set; } = "Unknown command.";
 
         public CmdUnknown()

@@ -15,13 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with kf2 adminhelper.  If not, see <http://www.gnu.org/licenses/>.
  */
-using System;
-using System.Collections.Generic;
 namespace KF2Admin.Admin.Commands
 {
     public class PlayerCommand : Command
     {
-        public string OnNoPlayer { get; set; } = "Can't mute : {0}";
+        public string OnNoPlayer { get; set; } = "Can't find player : {0}";
         public string OnAction { get; set; } = "{0} was affected by {1}";
         public string OnActionReason { get; set; } = "{0} was affected by {1} for {2}";
 

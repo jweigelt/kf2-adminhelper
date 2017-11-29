@@ -15,16 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with kf2 adminhelper.  If not, see <http://www.gnu.org/licenses/>.
  */
+using System;
 using System.Collections.Generic;
 using KF2Admin.Utility;
 using KF2Admin.Config;
-using System;
 
 namespace KF2Admin.Admin
 {
     public class PlayerHandler
     {
-
         private List<Player> playerList = null;
         private List<Player> statsPlayerList = null;
         private List<Player> playerCache = null;
@@ -35,8 +34,7 @@ namespace KF2Admin.Admin
 
         public bool Open()
         {
-            ConfigSerializer cs = new ConfigSerializer(typeof(PlayerHandlerConfiguration));
-            config = (PlayerHandlerConfiguration)cs.LoadFromFile(Constants.CONFIG_FILE_PLAYERHANDLER, Constants.CONFIG_DIR);
+            config = tool.FileIO.ReadConfig<PlayerHandlerConfiguration>();
             return true;
         }
 
@@ -79,9 +77,9 @@ namespace KF2Admin.Admin
         {
             if (tool.Status.CurrentWave < lastWave)
             {
-                Logger.Log("[PLH] New game started.", LogLevel.Info);
+                Logger.Log(LogLevel.Info, "[PLH] New game started.");
 
-                //TODO: liste seems to be empty during map load
+                //TODO: list seems to be empty during map load
                 /*foreach (Player stat in statsPlayerList)
                 {
                     Player p = null;
@@ -145,7 +143,7 @@ namespace KF2Admin.Admin
 
         private void OnPlayerLeave(Player p)
         {
-            Logger.Log("[PLH] Player '{0}' left", LogLevel.Verbose, p.PlayerName);
+            Logger.Log(LogLevel.Verbose, "[PLH] Player '{0}' left",  p.PlayerName);
             p.CacheTime = DateTime.Now;
             playerCache.Add(p);
         }
@@ -156,12 +154,12 @@ namespace KF2Admin.Admin
 
             if (p.IsNew)
             {
-                Logger.Log("[PLH] Registering player '{0}', Steam-ID: '{1}'", LogLevel.Verbose, p.PlayerName, p.SteamId);
+                Logger.Log(LogLevel.Verbose, "[PLH] Registering player '{0}', Steam-ID: '{1}'", p.PlayerName, p.SteamId);
                 tool.Database.InsertPlayer(p);
             }
             else
             {
-                Logger.Log("[PLH] Updating player '{0}', Steam-ID: '{1}'", LogLevel.Verbose, p.PlayerName, p.SteamId);
+                Logger.Log(LogLevel.Verbose, "[PLH] Updating player '{0}', Steam-ID: '{1}'", p.PlayerName, p.SteamId);
                 tool.Database.UpdatePlayer(p);
             }
 
@@ -176,7 +174,7 @@ namespace KF2Admin.Admin
                     if (config.WelcomeOldPlayer) tool.Say(config.OnWelcomeOldPlayer, p.PlayerName, p.Visits.ToString());
                 }
 
-                Logger.Log("[PLH] New player '{0}' joined.", LogLevel.Verbose, p.PlayerName);
+                Logger.Log(LogLevel.Verbose, "[PLH] New player '{0}' joined.", p.PlayerName);
             }
         }
 

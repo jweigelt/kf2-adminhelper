@@ -15,21 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with kf2 adminhelper.  If not, see <http://www.gnu.org/licenses/>.
  */
-using System.Collections.Generic;
-using System.Xml.Serialization;
-
-namespace KF2Admin.Admin.Announce
+namespace KF2Admin.Admin
 {
-    public class AnnounceConfiguration
+    public class GameLength
     {
-        [XmlIgnore]
-        public const string FILE_NAME = "./cfg/announce.xml";
+        public string Value { get; set; }
+        public string Name { get; set; }
+        public string Alias { get; set; }
 
-        [XmlIgnore]
-        public const string RESOURCE_NAME = "KF2Admin.Resources.cfg.announce.xml";
-
-        public bool Enable { get; set; } = false;
-        public int AnnounceDelay { get; set; } = 60000 * 10;
-        public List<Announce> AnnounceList { get; set; } = new List<Announce>();
+        public GameLength() { }
+        public GameLength(string value, string name, string alias)
+        {
+            Value = value;
+            Name = name;
+            Alias = alias;
+        }
     }
 }

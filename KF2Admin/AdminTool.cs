@@ -29,6 +29,7 @@ namespace KF2Admin
 {
     public class AdminTool
     {
+        public FileHandler FileIO { get; }
         public WebHelper Web { get; }
         public PlayerHandler Players { get; }
         public CommandDispatcher Commands { get; }
@@ -46,7 +47,9 @@ namespace KF2Admin
 
         public AdminTool()
         {
-            Logger.Log("{0} v{1}, {2}", LogLevel.Banner, Constants.PRODUCT_NAME, Constants.PRODUCT_VERSION, Constants.PRODUCT_AUTHOR);
+             Logger.MinLevel = LogLevel.Info;
+            Logger.Log(LogLevel.Info, "{0} v{1}, {2}", Constants.PRODUCT_NAME, Constants.PRODUCT_VERSION, Constants.PRODUCT_AUTHOR);
+            FileIO = new FileHandler();
             Web = new WebHelper();
             Players = new PlayerHandler(this);
             Commands = new CommandDispatcher(this);
@@ -59,32 +62,37 @@ namespace KF2Admin
         public void Run()
         {
             running = true;
-            ConfigSerializer cs = new ConfigSerializer(typeof(CoreConfiguration));
-            config = (CoreConfiguration)cs.LoadFromFile(Constants.CONFIG_FILE_CORE, Constants.CONFIG_DIR);
+            config = FileIO.ReadConfig<CoreConfiguration>();
 
             Logger.LogToFile = config.LogToFile;
             Logger.MinLevel = config.LogMinimumLevel;
             Logger.LogFile = config.LogFile;
 
+            Database.SQLType = Config.SQLType;
             Database.SQLiteFileName = Config.SQLiteFile;
+            Database.MySQLHostName = Config.MySQLHostName;
+            Database.MySQLDbName = Config.MySQLDbName;
+            Database.MySQLUserName = Config.MySQLUserName;
+            Database.MySQLPassword = Config.MySQLPassword;
 
             Web.UserName = config.WebAdminUserName;
             Web.Password = config.WebAdminPassword;
             Web.WebAdminUrl = config.WebAdminURL;
             Web.UserAgent = Constants.PRODUCT_NAME + "/" + Constants.PRODUCT_VERSION;
 
-            Commands.RegisterCommand(typeof(CmdTest), "test.xml");
-            Commands.RegisterCommand(typeof(CmdMute), "mute.xml");
-            Commands.RegisterCommand(typeof(CmdUnmute), "unmute.xml");
-            Commands.RegisterCommand(typeof(CmdKick), "kick.xml");
-            Commands.RegisterCommand(typeof(CmdBanIP), "ipban.xml");
-            Commands.RegisterCommand(typeof(CmdBanSession), "sessionban.xml");
-            Commands.RegisterCommand(typeof(CmdBanUqId), "ban.xml");
-            Commands.RegisterCommand(typeof(CmdMap), "map.xml");
-            Commands.RegisterCommand(typeof(CmdDifficulty), "difficulty.xml");
-            Commands.RegisterCommand(typeof(CmdPutGroup), "putgroup.xml");
-            Commands.RegisterCommand(typeof(CmdRmGroup), "rmgroup.xml");
-            Commands.RegisterCommand(typeof(CmdGimmeAdmin), "gimmeadmin.xml");
+            Commands.RegisterCommand<CmdTest>();
+            Commands.RegisterCommand<CmdMute>();
+            Commands.RegisterCommand<CmdUnmute>();
+            Commands.RegisterCommand<CmdKick>();
+            Commands.RegisterCommand<CmdBanIP>();
+            Commands.RegisterCommand<CmdBanSession>();
+            Commands.RegisterCommand<CmdBanUqId>();
+            Commands.RegisterCommand<CmdMap>();
+            Commands.RegisterCommand<CmdDifficulty>();
+            Commands.RegisterCommand<CmdLength>();
+            Commands.RegisterCommand<CmdPutGroup>();
+            Commands.RegisterCommand<CmdRmGroup>();
+            Commands.RegisterCommand<CmdGimmeAdmin>();
 
             if (!AutoAnnounce.Open()) return;
             if (!Database.Open()) return;
@@ -104,10 +112,10 @@ namespace KF2Admin
 
             Scheduler.Start();
 
-            Logger.Log("[COR] {0} is up. Found {1} installed maps and {2} gamemodes.", LogLevel.Info, Constants.PRODUCT_NAME, Status.InstalledMaps.Count.ToString(), Status.InstalledGamemodes.Count.ToString());
+            Logger.Log(LogLevel.Info, "[COR] {0} is up. Found {1} installed maps and {2} gamemodes.", Constants.PRODUCT_NAME, Status.InstalledMaps.Count.ToString(), Status.InstalledGamemodes.Count.ToString());
 
             HandleConsole();
-            Logger.Log("[COR] Shutting down...", LogLevel.Info);
+            Logger.Log(LogLevel.Info, "[COR] Shutting down...");
 
             Scheduler.Stop();
             Web.Logout();
@@ -127,6 +135,7 @@ namespace KF2Admin
             {
                 command = Console.ReadLine();
                 if (command == "exit") running = false;
+                Web.Say(command);
             }
         }
 
